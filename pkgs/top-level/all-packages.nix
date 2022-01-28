@@ -6933,6 +6933,8 @@ with pkgs;
 
   darkice = callPackage ../tools/audio/darkice { };
 
+  bc-decaf = callPackage ../development/libraries/decaf/bc-decaf.nix { };
+
   deco = callPackage ../applications/misc/deco { };
 
   icoutils = callPackage ../tools/graphics/icoutils { };
@@ -16478,6 +16480,8 @@ with pkgs;
 
   bctoolbox = callPackage ../development/libraries/bctoolbox { };
 
+  bc-soci = callPackage ../development/libraries/soci/bc-soci.nix { };
+
   bearssl = callPackage ../development/libraries/bearssl { };
 
   beecrypt = callPackage ../development/libraries/beecrypt { };
@@ -19387,7 +19391,7 @@ with pkgs;
 
   mdds = callPackage ../development/libraries/mdds { };
 
-  mediastreamer = callPackage ../development/libraries/mediastreamer { };
+  mediastreamer = libsForQt5.callPackage ../development/libraries/mediastreamer { };
 
   mediastreamer-openh264 = callPackage ../development/libraries/mediastreamer/msopenh264.nix { };
 

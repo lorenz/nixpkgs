@@ -1,16 +1,28 @@
 { bcunit
 , cmake
+, bc-decaf
 , fetchFromGitLab
 , mbedtls
-, lib, stdenv
+, lib
+, stdenv
 }:
 
 stdenv.mkDerivation rec {
   pname = "bctoolbox";
   version = "5.1.17";
 
-  nativeBuildInputs = [ cmake bcunit ];
-  buildInputs = [ mbedtls ];
+  nativeBuildInputs = [
+    # Made by BC
+    bcunit
+
+    cmake
+  ];
+  buildInputs = [
+    # Vendored by BC
+    bc-decaf
+
+    mbedtls
+  ];
 
   src = fetchFromGitLab {
     domain = "gitlab.linphone.org";
