@@ -5,7 +5,6 @@
 , lib
 , bc-soci
 , sqlite
-, boost
 , stdenv
 }:
 
@@ -31,7 +30,6 @@ stdenv.mkDerivation rec {
     bc-soci
 
     sqlite
-    boost
   ];
   nativeBuildInputs = [ cmake ];
 

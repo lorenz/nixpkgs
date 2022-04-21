@@ -1,52 +1,18 @@
-{ bcg729
-, bctoolbox
-, bcunit
+{ bctoolbox
 , belcard
 , belle-sip
 , belr
-, bzrtp
-, cairo
 , cmake
-, cyrus_sasl
 , fetchFromGitLab
-, fetchurl
-, ffmpeg
-, gdk-pixbuf
-, glib
-, gnused
-, graphviz
-, gtk2
-, intltool
 , lib
-, libexosip
 , liblinphone
-, libmatroska
-, libnotify
-, libosip
-, libsoup
-, libupnp
-, libX11
-, libxml2
-, makeWrapper
-, mbedtls
 , mediastreamer
 , mediastreamer-openh264
 , minizip2
 , mkDerivation
-, openldap
-, ortp
-, pango
-, pkg-config
-, qtbase
 , qtgraphicaleffects
 , qtquickcontrols2
 , qttranslations
-, readline
-, speex
-, sqlite
-
-, udev
-, zlib
 }:
 
 # How to update Linphone? (The Qt desktop app)
