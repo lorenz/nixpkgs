@@ -1,5 +1,6 @@
 { stdenv
 , fetchgit
+, fetchpatch
 , lib
 , meson
 , ninja
@@ -28,6 +29,13 @@ stdenv.mkDerivation rec {
     rev = "v${version}";
     hash = "sha256-u5FnfXBCjwSp8QBrH8KIkVGV32/9pff41ZWjWXOwuMI=";
   };
+
+  patches = [
+    (fetchpatch {
+      url = "https://git.libcamera.org/libcamera/libcamera.git/patch/?id=96ed45b9711e5c70afc4f91eab0ed657ccfb9695";
+      hash = "sha256-u6THljVnOHB2Az8Icq4sgs5LN0WkO1g6F0r7OQFeFjE=";
+    })
+  ];
 
   postPatch = ''
     patchShebangs utils/
