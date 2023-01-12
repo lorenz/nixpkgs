@@ -73,9 +73,6 @@ stdenv.mkDerivation (finalAttrs: {
     "-Dwayland_eglstream=true"
     "-Dprofiler=true"
     "-Dxwayland_path=${xwayland}/bin/Xwayland"
-    # This should be auto detected, but it looks like it manages a false
-    # positive.
-    "-Dxwayland_initfd=disabled"
     "-Ddocs=true"
   ];
 
