@@ -197,6 +197,13 @@ in {
       ];
     };
 
+    linux_bpi_r3 = callPackage ../os-specific/linux/kernel/linux-bpi-r3.nix {
+      kernelPatches = [
+        kernelPatches.bridge_stp_helper
+        kernelPatches.request_key_helper
+      ];
+    };
+
     # Using zenKernels like this due lqx&zen came from one source, but may have different base kernel version
     # https://github.com/NixOS/nixpkgs/pull/161773#discussion_r820134708
     zenKernels = callPackage ../os-specific/linux/kernel/zen-kernels.nix;
@@ -580,6 +587,8 @@ in {
     linux_xanmod_tt = throw "linux_xanmod_tt was removed because upstream no longer offers this option";
 
     hardkernel_4_14 = recurseIntoAttrs (packagesFor kernels.linux_hardkernel_4_14);
+
+    linux_bpi_r3 = recurseIntoAttrs (packagesFor kernels.linux_bpi_r3);
 
     linux_libre = recurseIntoAttrs (packagesFor kernels.linux_libre);
 

@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, openssl, pkgsCross, buildPackages
+{ lib, stdenv, fetchFromGitHub, openssl, dtc, pkgsCross, buildPackages
 
 # Warning: this blob (hdcp.bin) runs on the main CPU (not the GPU) at
 # privilege level EL3, which is above both the kernel and the
@@ -47,7 +47,7 @@ let
     depsBuildBuild = [ buildPackages.stdenv.cc ];
 
     # For Cortex-M0 firmware in RK3399
-    nativeBuildInputs = [ pkgsCross.arm-embedded.stdenv.cc ];
+    nativeBuildInputs = [ pkgsCross.arm-embedded.stdenv.cc dtc];
 
     buildInputs = [ openssl ];
 
@@ -89,12 +89,11 @@ in {
   armTrustedFirmwareTools = buildArmTrustedFirmware rec {
     extraMakeFlags = [
       "HOSTCC=${stdenv.cc.targetPrefix}gcc"
-      "fiptool" "certtool" "sptool"
+      "fiptool" "certtool"
     ];
     filesToInstall = [
       "tools/fiptool/fiptool"
       "tools/cert_create/cert_create"
-      "tools/sptool/sptool"
     ];
     postInstall = ''
       mkdir -p "$out/bin"
@@ -145,5 +144,17 @@ in {
     platform = "gxbb";
     extraMeta.platforms = ["aarch64-linux"];
     filesToInstall = [ "build/${platform}/release/bl31.bin"];
+  };
+  armTrustedFirmwareMT7986 = buildArmTrustedFirmware rec {
+    src = fetchFromGitHub {
+      owner = "mtk-openwrt";
+      repo = "arm-trusted-firmware";
+      rev = "7539348480af57c6d0db95aba6381f3ee7483779";
+      sha256 = "sha256-OjM+metlaEzV7mXA8QHYEQd94p8zK34dLTqbyWQh1bQ=";
+    };
+    extraMakeFlags = [ "BOOT_DEVICE=nor" "DRAM_USE_DDR4=1" "all" ];
+    extraMeta.platforms = [ "aarch64-linux" ];
+    platform = "mt7986";
+    filesToInstall = [ "build/${platform}/release/bl2.img" "build/${platform}/release/bl31.bin" ];
   };
 }

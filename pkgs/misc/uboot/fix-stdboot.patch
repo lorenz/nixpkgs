@@ -1,0 +1,22 @@
+diff --git a/boot/bootmeth_distro.c b/boot/bootmeth_distro.c
+index 356929828b..dd131c4515 100644
+--- a/boot/bootmeth_distro.c
++++ b/boot/bootmeth_distro.c
+@@ -127,6 +127,17 @@ static int distro_read_bootflow(struct udevice *dev, struct bootflow *bflow)
+ 		return log_msg_ret("try", ret);
+ 	size = bflow->size;
+ 
++	const char *last_slash;
++	int path_len;
++
++	last_slash = strrchr(bflow->fname, '/');
++	if (last_slash) {
++		path_len = (last_slash - bflow->fname) + 1;
++		bflow->subdir = malloc(path_len + 1);
++		memcpy(bflow->subdir, bflow->fname, path_len);
++		bflow->subdir[path_len] = '\0';
++	}
++
+ 	ret = bootmeth_alloc_file(bflow, 0x10000, 1);
+ 	if (ret)
+ 		return log_msg_ret("read", ret);

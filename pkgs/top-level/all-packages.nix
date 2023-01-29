@@ -25425,6 +25425,7 @@ with pkgs;
     armTrustedFirmwareRK3328
     armTrustedFirmwareRK3399
     armTrustedFirmwareS905
+    armTrustedFirmwareMT7986
     ;
 
   microcodeAmd = callPackage ../os-specific/linux/microcode/amd.nix { };
@@ -25931,6 +25932,10 @@ with pkgs;
   # Hardkernel (Odroid) kernels.
   linuxPackages_hardkernel_latest = linuxKernel.packageAliases.linux_hardkernel_latest;
   linux_hardkernel_latest = linuxPackages_hardkernel_latest.kernel;
+
+  # Banana Pi R3 close-to-mainline kernel
+  linuxPackages_bpi_r3 = linuxKernel.packages.linux_bpi_r3;
+  linux_bpi_r3 = linuxKernel.kernels.linux_bpi_r3;
 
   # GNU Linux-libre kernels
   linuxPackages-libre = linuxKernel.packages.linux_libre;
@@ -26613,6 +26618,7 @@ with pkgs;
     ubootSopine
     ubootUtilite
     ubootWandboard
+    ubootBPiR3
     ;
 
   # Upstream Barebox:

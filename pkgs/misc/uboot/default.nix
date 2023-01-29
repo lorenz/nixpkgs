@@ -19,14 +19,15 @@
 , armTrustedFirmwareRK3328
 , armTrustedFirmwareRK3399
 , armTrustedFirmwareS905
+, armTrustedFirmwareMT7986
 , buildPackages
 }:
 
 let
-  defaultVersion = "2022.10";
+  defaultVersion = "2023.01";
   defaultSrc = fetchurl {
     url = "ftp://ftp.denx.de/pub/u-boot/u-boot-${defaultVersion}.tar.bz2";
-    hash = "sha256-ULRIKlBbwoG6hHDDmaPCbhReKbI1ALw1xQ3r1/pGvfg=";
+    hash = "sha256-aUI7rTgPiaCRZjbonm3L0uRRLVhDCNki0QOdHkMxlQ8=";
   };
   buildUBoot = lib.makeOverridable ({
     version ? null
@@ -565,5 +566,31 @@ in {
     extraMeta.platforms = ["aarch64-linux"];
     BL31 = "${armTrustedFirmwareRK3399}/bl31.elf";
     filesToInstall = [ "u-boot.itb" "idbloader.img"];
+  };
+
+  ubootBPiR3 = buildUBoot {
+    defconfig = "mt7986a_bpi-r3-emmc_defconfig";
+    extraMeta.platforms = [ "aarch64-linux" ];
+    extraConfig = ''
+      CONFIG_ZSTD=y
+      CONFIG_ENV_IS_IN_MMC=n
+      CONFIG_ENV_IS_IN_SPI_FLASH=y
+      CONFIG_ENV_SECT_SIZE_AUTO=y
+      CONFIG_ENV_SECT_SIZE=0x10000
+      CONFIG_ENV_ADDR=0x40000
+      CONFIG_ENV_SIZE=0x40000
+      CONFIG_ENV_ADDR_REDUND=0x80000
+      CONFIG_AUTOBOOT_MENU_SHOW=n
+      CONFIG_BOOTSTD_FULL=y
+      CONFIG_AUTOBOOT_KEYED=n
+      CONFIG_SUPPORT_RAW_INITRD=y
+    '';
+    patches = [ ./add-bpi-r3.patch ./fix-stdboot.patch ];
+    postBuild = ''
+      '${buildPackages.armTrustedFirmwareTools}/bin/fiptool' create \
+        --soc-fw ${armTrustedFirmwareMT7986}/bl31.bin \
+        --nt-fw u-boot.bin u-boot.fip
+    '';
+    filesToInstall = ["u-boot.fip"];
   };
 }
