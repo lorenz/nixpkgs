@@ -1617,7 +1617,7 @@ index 908fa89444c90..338f238f2043c 100644
  
  static void
 diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index d56eda6397a41..d1fc67e638bec 100644
+index d56eda6397a41..96bb301c8a586 100644
 --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
 +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
 @@ -51,6 +51,7 @@ static const struct mtk_reg_map mtk_reg_map = {
@@ -1735,7 +1735,19 @@ index d56eda6397a41..d1fc67e638bec 100644
  	schedule_work(&eth->pending_work);
  }
  
-@@ -3473,22 +3519,188 @@ static void mtk_set_mcr_max_rx(struct mtk_mac *mac, u32 val)
+@@ -3374,8 +3420,10 @@ static int mtk_clk_enable(struct mtk_eth *eth)
+ 
+ 	for (clk = 0; clk < MTK_CLK_MAX ; clk++) {
+ 		ret = clk_prepare_enable(eth->clks[clk]);
+-		if (ret)
++		if (ret) {
++			dev_err(eth->dev, "enabling clock %s failed with error %d\n", mtk_clks_source_name[clk], ret);
+ 			goto err_disable_clks;
++		}
+ 	}
+ 
+ 	return 0;
+@@ -3473,22 +3521,188 @@ static void mtk_set_mcr_max_rx(struct mtk_mac *mac, u32 val)
  		mtk_w32(mac->hw, mcr_new, MTK_MAC_MCR(mac->id));
  }
  
@@ -1931,7 +1943,7 @@ index d56eda6397a41..d1fc67e638bec 100644
  
  	if (eth->ethsys)
  		regmap_update_bits(eth->ethsys, ETHSYS_DMA_AG_MAP, dma_mask,
-@@ -3512,22 +3724,14 @@ static int mtk_hw_init(struct mtk_eth *eth)
+@@ -3512,22 +3726,14 @@ static int mtk_hw_init(struct mtk_eth *eth)
  		return 0;
  	}
  
@@ -1941,11 +1953,11 @@ index d56eda6397a41..d1fc67e638bec 100644
 -	} else {
 -		val = RSTCTRL_PPE0;
 -	}
--
--	if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
--		val |= RSTCTRL_PPE1;
 +	msleep(100);
  
+-	if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
+-		val |= RSTCTRL_PPE1;
+-
 -	ethsys_reset(eth, RSTCTRL_ETH | RSTCTRL_FE | val);
 +	if (reset)
 +		mtk_hw_warm_reset(eth);
@@ -1959,7 +1971,7 @@ index d56eda6397a41..d1fc67e638bec 100644
  		/* Set FE to PDMAv2 if necessary */
  		val = mtk_r32(eth, MTK_FE_GLO_MISC);
  		mtk_w32(eth,  val | BIT(4), MTK_FE_GLO_MISC);
-@@ -3629,8 +3833,10 @@ static int mtk_hw_init(struct mtk_eth *eth)
+@@ -3629,8 +3835,10 @@ static int mtk_hw_init(struct mtk_eth *eth)
  	return 0;
  
  err_disable_pm:
@@ -1972,7 +1984,7 @@ index d56eda6397a41..d1fc67e638bec 100644
  
  	return ret;
  }
-@@ -3709,52 +3915,86 @@ static int mtk_do_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+@@ -3709,52 +3917,86 @@ static int mtk_do_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
  	return -EOPNOTSUPP;
  }
  
@@ -2073,7 +2085,7 @@ index d56eda6397a41..d1fc67e638bec 100644
  	rtnl_unlock();
  }
  
-@@ -3799,6 +4039,7 @@ static int mtk_cleanup(struct mtk_eth *eth)
+@@ -3799,6 +4041,7 @@ static int mtk_cleanup(struct mtk_eth *eth)
  	mtk_unreg_dev(eth);
  	mtk_free_dev(eth);
  	cancel_work_sync(&eth->pending_work);
@@ -2081,7 +2093,7 @@ index d56eda6397a41..d1fc67e638bec 100644
  
  	return 0;
  }
-@@ -4253,6 +4494,7 @@ static int mtk_probe(struct platform_device *pdev)
+@@ -4253,6 +4496,7 @@ static int mtk_probe(struct platform_device *pdev)
  
  	eth->rx_dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
  	INIT_WORK(&eth->rx_dim.work, mtk_dim_rx);
@@ -2089,7 +2101,7 @@ index d56eda6397a41..d1fc67e638bec 100644
  
  	eth->tx_dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
  	INIT_WORK(&eth->tx_dim.work, mtk_dim_tx);
-@@ -4366,7 +4608,7 @@ static int mtk_probe(struct platform_device *pdev)
+@@ -4366,7 +4610,7 @@ static int mtk_probe(struct platform_device *pdev)
  	eth->msg_enable = netif_msg_init(mtk_msg_level, MTK_DEFAULT_MSG_ENABLE);
  	INIT_WORK(&eth->pending_work, mtk_pending_work);
  
@@ -2098,7 +2110,7 @@ index d56eda6397a41..d1fc67e638bec 100644
  	if (err)
  		goto err_wed_exit;
  
-@@ -4455,6 +4697,8 @@ static int mtk_probe(struct platform_device *pdev)
+@@ -4455,6 +4699,8 @@ static int mtk_probe(struct platform_device *pdev)
  	netif_napi_add(&eth->dummy_dev, &eth->rx_napi, mtk_napi_rx);
  
  	platform_set_drvdata(pdev, eth);
@@ -3175,6 +3187,19 @@ index aca1b2f1e9e3b..56ed97a908475 100644
  
  /* MT TOP */
  #define MT_TOP_BASE			0x18060000
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7915/soc.c b/drivers/net/wireless/mediatek/mt76/mt7915/soc.c
+index c06c56a0270d6..94325c1811917 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7915/soc.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7915/soc.c
+@@ -1236,6 +1236,8 @@ static const struct of_device_id mt7986_wmac_of_match[] = {
+ 	{},
+ };
+ 
++MODULE_DEVICE_TABLE(of, mt7986_wmac_of_match);
++
+ struct platform_driver mt7986_wmac_driver = {
+ 	.driver = {
+ 		.name = "mt7986-wmac",
 diff --git a/drivers/net/wireless/mediatek/mt76/mt7996/init.c b/drivers/net/wireless/mediatek/mt76/mt7996/init.c
 index 46b2905260926..64e8dfd06e9fe 100644
 --- a/drivers/net/wireless/mediatek/mt76/mt7996/init.c
