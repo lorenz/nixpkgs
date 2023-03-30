@@ -1,0 +1,20 @@
+diff --git a/pixiecore/dhcp.go b/pixiecore/dhcp.go
+index fdfe3af..e0ebac4 100644
+--- a/pixiecore/dhcp.go
++++ b/pixiecore/dhcp.go
+@@ -129,14 +129,7 @@ func (s *Server) validateDHCP(pkt *dhcp4.Packet) (mach Machine, fwtype Firmware,
+ 		// that uses iPXE as the PXE "ROM"), special handling is
+ 		// needed because in this mode the client is using iPXE native
+ 		// drivers and chainloading to a UNDI stack won't work.
+-		if userClass == "iPXE" && fwtype == FirmwareX86PC {
+-			fwtype = FirmwareX86Ipxe
+-		}
+-		// If the client identifies as "pixiecore", we've already
+-		// chainloaded this client to the full-featured copy of iPXE
+-		// we supply. We have to distinguish this case so we don't
+-		// loop on the chainload step.
+-		if userClass == "pixiecore" {
++		if userClass == "iPXE" {
+ 			fwtype = FirmwarePixiecoreIpxe
+ 		}
+ 	}

@@ -1,18 +1,34 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{ lib, buildGoModule, fetchFromGitHub, go-bindata, ipxe }:
 
 buildGoModule rec {
   pname = "pixiecore";
-  version = "2020-03-25";
-  rev = "68743c67a60c18c06cd21fd75143e3e069ca3cfc";
+  version = "2023-02-25";
+  rev = "fc2840fa7b05c2f2447452e0dcc35a5a76f6acfa";
 
   src = fetchFromGitHub {
     owner = "danderson";
     repo = "netboot";
     inherit rev;
-    sha256 = "14dslmx3gk08h9gqfjw5y27x7d2c6r8ir7mjd7l9ybysagpzr02a";
+    hash = "sha256-TV0GJqhg/KEmbJzbaHD/WkSLeOx3GoVEidPrepN0P4Q=";
   };
 
-  vendorSha256 = "08n3m6fkwh8jmmzky3ygij4gxlcqidqk5ywi8ki8bkyzzs2lqaw7";
+  vendorHash = "sha256-hytMhf7fz4XiRJH7MnGLmNH+iIzPDz9/rRJBPp2pwyI=";
+  patches = [ ./fix-chainloading.patch ];
+
+  nativeBuildInputs = [ go-bindata ];
+  buildInputs = [ ipxe ];
+  postPatch = ''
+    mkdir -p third_party/ipxe/src/bin third_party/ipxe/src/bin-x86_64-efi third_party/ipxe/src/bin-i386-efi
+    cp ${ipxe}/undionly.kpxe third_party/ipxe/src/bin
+    cp ${ipxe}/ipxe.efi third_party/ipxe/src/bin-x86_64-efi/ipxe.efi
+    touch third_party/ipxe/src/bin/ipxe.pxe
+    touch third_party/ipxe/src/bin-i386-efi/ipxe.efi
+    go-bindata -o out/ipxe/bindata.go -pkg ipxe -nometadata -nomemcopy \
+    	third_party/ipxe/src/bin/ipxe.pxe \
+	third_party/ipxe/src/bin/undionly.kpxe \
+	third_party/ipxe/src/bin-x86_64-efi/ipxe.efi \
+	third_party/ipxe/src/bin-i386-efi/ipxe.efi
+  '';
 
   doCheck = false;
 
