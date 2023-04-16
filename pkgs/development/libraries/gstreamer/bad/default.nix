@@ -275,6 +275,7 @@ stdenv.mkDerivation rec {
     "-Dgs=disabled" # depends on `google-cloud-cpp`
     "-Donnx=disabled" # depends on `libonnxruntime` not packaged in nixpkgs as of writing
     "-Dopenaptx=enabled" # since gstreamer-1.20.1 `libfreeaptx` is supported for circumventing the dubious license conflict with `libopenaptx`
+    "-Dmicrodns=disabled" # Causes every application using GstDeviceMonitor to emit mDNS queries every 2 seconds, no known users
     "-Dbluez=${if bluezSupport then "enabled" else "disabled"}"
   ]
   ++ lib.optionals (!stdenv.isLinux) [
