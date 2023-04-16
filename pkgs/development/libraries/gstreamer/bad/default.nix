@@ -32,7 +32,6 @@
 , libbs2b
 , libmodplug
 , libmpeg2
-, libmicrodns
 , openjpeg
 , libopus
 , librsvg
@@ -145,7 +144,6 @@ stdenv.mkDerivation rec {
     #webrtc-audio-processing_1 # required by isac
     libbs2b
     libmodplug
-    libmicrodns
     openjpeg
     libopenmpt
     libopus
